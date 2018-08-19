@@ -43,4 +43,7 @@ class Team:
                 count += 1
                 ageSum += player.age
 
-        return ageSum / count
+        if count > 0:
+            return ageSum / count
+        else:
+            return 0
