@@ -1,8 +1,11 @@
 # Used for the API calls
 import requests
 
-# Used to check for the existence of the player data
-import os.path
+# Used while manipulating the player data file
+import os
+
+# Used to check the last time the data file was modified against now
+import time
 
 # Used for converting the JSON response for the player data to string
 import json
@@ -43,8 +46,16 @@ class SleeperPy:
                 self.player_map[player_id] = Player(player_name, player_pos, player_age)
 
     # Determines whether or not we should create/recreate the player data file
+    #
+    # According to https://docs.sleeper.app/#players, we do need to call the endpoint
+    # to refresh data more than once a day. Therefore, enforce that here by only
+    # refreshing the data if it's been more than 24 hours or if the file doesn't exist
     def _shouldCreatePlayerFile(self, filename):
-        return not os.path.exists(filename)
+        if os.path.exists(filename):
+            ONE_DAY_SECONDS = 60 * 60 * 24
+            modified_more_than_one_day_ago = int(time.time()) - int(os.path.getmtime(filename)) > ONE_DAY_SECONDS
+
+        return (not os.path.exists(filename)) | modified_more_than_one_day_ago
 
     # Deletes and creates the player data file
     def _createPlayerFile(self, filename):
