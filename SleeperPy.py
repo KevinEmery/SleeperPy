@@ -51,6 +51,7 @@ class SleeperPy:
     # to refresh data more than once a day. Therefore, enforce that here by only
     # refreshing the data if it's been more than 24 hours or if the file doesn't exist
     def _shouldCreatePlayerFile(self, filename):
+        modified_more_than_one_day_ago = False
         if os.path.exists(filename):
             ONE_DAY_SECONDS = 60 * 60 * 24
             modified_more_than_one_day_ago = int(time.time()) - int(os.path.getmtime(filename)) > ONE_DAY_SECONDS
