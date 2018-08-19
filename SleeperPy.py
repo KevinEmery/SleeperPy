@@ -144,5 +144,9 @@ class SleeperPy:
         if player_id in self.player_map:
             return self.player_map[player_id]
 
+        # Defensive units are stored with string keys
+        if str(player_id).isalpha():
+            return Player(player_id, "DEF", 0)
+
         print("Found unknown player_id " + player_id)
         return Player("Unknown", "Unknown", 0)
