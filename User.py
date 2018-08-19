@@ -15,7 +15,7 @@ class User:
     username = ""
     display_name = ""
     team_name = ""
-    leagues = {}
+    user_leagues_metadata = {}
 
     def __init__(self, json):
         self.display_name = json["display_name"]
@@ -27,21 +27,21 @@ class User:
         with suppress(KeyError):
             self.team_name = json["metadata"]["team_name"]
 
-        self.leagues = self.getLeagues()
+        self.user_leagues_metadata = self.get_leagues()
 
     @classmethod
-    def getUser_byUsername(self,username):
+    def get_user_by_username(self,username):
         r = requests.get(self._get_user_base_url + username)
         data = r.json()
         return self(data)
 
     @classmethod
-    def get_User_byID(self,user_id):
+    def get_user_by_id(self,user_id):
         r = requests.get(self._get_user_base_url + str(user_id))
         data = r.json()
         return self(data)
 
-    def getLeagues(self,sport="nfl",season=2018):
+    def get_leagues(self,sport="nfl",season=2018):
         r = requests.get(self._get_user_base_url + str(self.user_id)+"/leagues/"+sport+"/"+str(season))
 
         leagues = {}
