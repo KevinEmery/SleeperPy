@@ -114,7 +114,16 @@ class SleeperPy:
             for player in roster["players"]:
                 players.append(self.getPlayer(player))
 
-            teams.append(Team(users[roster["owner_id"]], players))
+            # If there is no owner (because the team is abandoned) then they're not in
+            # users, so we need to add a dummy owner to allow the code to continue
+            #
+            # TODO: This likely could be refined better than "unknown"
+            try:
+                owner = users[roster["owner_id"]]
+            except KeyError:
+                owner = User({"display_name": "unknown", "user_id": "unknown"})
+
+            teams.append(Team(owner, players))
 
         return League(league_name, teams)
 
