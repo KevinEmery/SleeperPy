@@ -4,11 +4,11 @@ class Team:
         self.name = user.team_name
         self.players = players
 
-    def getTeamSize(self):
+    def get_team_size(self):
         return len(self.players)
 
     # Returns the number of offensive players
-    def getOffensivePlayerCount(self):
+    def get_offensive_player_count(self):
         count = 0
         for player in self.players:
             if player.isOffensive():
@@ -17,7 +17,7 @@ class Team:
         return count
 
     # Returns the number of defensive players on the team
-    def getDefensivePlayerCount(self):
+    def get_defensive_player_count(self):
         count = 0
         for player in self.players:
             if player.isDefensive():
@@ -26,7 +26,7 @@ class Team:
         return count
 
     # Returns the number of players at the specified position
-    def getCountAtPosition(self, position):
+    def get_count_at_position(self, position):
         count = 0
         for player in self.players:
             if player.position == position:
@@ -35,7 +35,7 @@ class Team:
         return count
 
     # Returns the average age of every player at the specified position
-    def getAverageAgeAtPosition(self, position):
+    def get_average_age_at_position(self, position):
         count = 0
         ageSum = 0
         for player in self.players:

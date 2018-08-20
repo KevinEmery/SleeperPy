@@ -2,14 +2,12 @@
 from contextlib import suppress
 # Used for the API calls
 import requests
-# Used for converting the JSON response for the player data to string
-import json
+
 
 class User:
 
     # Base URLs used as a part of the API requests
     _get_user_base_url = "https://api.sleeper.app/v1/user/"
-
 
     user_id = ""
     username = ""
@@ -30,24 +28,28 @@ class User:
         self.user_leagues_metadata = self.get_leagues()
 
     @classmethod
-    def get_user_by_username(self,username):
+    def get_user_by_username(self, username):
         r = requests.get(self._get_user_base_url + username)
         data = r.json()
         return self(data)
 
     @classmethod
-    def get_user_by_id(self,user_id):
+    def get_user_by_id(self, user_id):
         r = requests.get(self._get_user_base_url + str(user_id))
         data = r.json()
         return self(data)
 
-    def get_leagues(self,sport="nfl",season=2018):
-        r = requests.get(self._get_user_base_url + str(self.user_id)+"/leagues/"+sport+"/"+str(season))
+    def get_leagues(self, sport="nfl", season=2018):
+        r = requests.get(self._get_user_base_url + str(self.user_id) + "/leagues/" + sport + "/" + str(season))
 
         leagues = {}
-        for league in r.json():
-            league_id = league["league_id"]
-            league_name = league["name"]
-            leagues[league_id] = league_name
+
+        # Check for a successful response before parsing the body
+        if (r.status_code >= 200 & r.status_code < 300):
+            for league in r.json():
+
+                league_id = league["league_id"]
+                league_name = league["name"]
+                leagues[league_id] = league_name
 
         return leagues

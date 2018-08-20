@@ -27,8 +27,8 @@ class SleeperPy:
         self.player_map = {}
 
         # Check to see if we should be re-creating the player file
-        if self._shouldCreatePlayerFile(filename):
-            self._createPlayerFile(filename)
+        if self._should_create_player_file(filename):
+            self._create_player_file(filename)
 
         # Read the player file from disk, placing the data into the dictionary
         with open(filename, "r") as file:
@@ -40,8 +40,8 @@ class SleeperPy:
                 player_name = player_data["first_name"] + " " + player_data["last_name"]
 
                 # Parse the other player data, allowing for "none"
-                player_pos = self._parsePlayerPosition(player_data["fantasy_positions"])
-                player_age = self._parsePlayerAge(player_data["age"])
+                player_pos = self._parse_player_position(player_data["fantasy_positions"])
+                player_age = self._parse_player_age(player_data["age"])
 
                 self.player_map[player_id] = Player(player_name, player_pos, player_age)
 
@@ -50,7 +50,7 @@ class SleeperPy:
     # According to https://docs.sleeper.app/#players, we do need to call the endpoint
     # to refresh data more than once a day. Therefore, enforce that here by only
     # refreshing the data if it's been more than 24 hours or if the file doesn't exist
-    def _shouldCreatePlayerFile(self, filename):
+    def _should_create_player_file(self, filename):
         modified_more_than_one_day_ago = False
         if os.path.exists(filename):
             ONE_DAY_SECONDS = 60 * 60 * 24
@@ -59,7 +59,7 @@ class SleeperPy:
         return (not os.path.exists(filename)) | modified_more_than_one_day_ago
 
     # Deletes and creates the player data file
-    def _createPlayerFile(self, filename):
+    def _create_player_file(self, filename):
         # We may be re-creating it because the file is too old, so check if we need to delete first
         if os.path.exists(filename):
             print("Deleting existing player file")
@@ -78,7 +78,8 @@ class SleeperPy:
 
     # Parse their fantasy position from the list provided, otherwise returning none
     # The main reason we have to handle "None" is because the coaches are in this data
-    def _parsePlayerPosition(self, raw_fantasy_positions):
+    @staticmethod
+    def _parse_player_position(raw_fantasy_positions):
         try:
             player_pos = raw_fantasy_positions[0]
         except TypeError:
@@ -88,7 +89,8 @@ class SleeperPy:
 
     # Parse their player age to an int from the string provided, default 0
     # The main reason we have to handle this is because the coaches are in this data with age "None"
-    def _parsePlayerAge(self, raw_age):
+    @staticmethod
+    def _parse_player_age(raw_age):
         try:
             player_age = int(raw_age)
         except TypeError:
@@ -97,13 +99,13 @@ class SleeperPy:
         return player_age
 
     # Prints out the metadata for the given league
-    def getLeague(self, league_id):
+    def get_league(self, league_id):
         r = requests.get(self._get_league_base_url + str(league_id))
         league_json = r.json()
         league_name = league_json["name"]
 
         # Retrieve the list of users
-        users = self.getUsersInLeague(league_id)
+        users = self.get_users_in_league(league_id)
 
         # Retrieve the rosters from the server
         r = requests.get(self._get_league_base_url + str(league_id) + "/rosters")
@@ -112,7 +114,7 @@ class SleeperPy:
             # Build the player list for each team
             players = []
             for player in roster["players"]:
-                players.append(self.getPlayer(player))
+                players.append(self.get_player(player))
 
             # If there is no owner (because the team is abandoned) then they're not in
             # users, so we need to add a dummy owner to allow the code to continue
@@ -128,9 +130,8 @@ class SleeperPy:
         return League(league_name, teams)
 
     # Returns a list of all of the users within the given league ID
-    def getUsersInLeague(self, league_id):
-        r = requests.get(self._get_league_base_url +
-                         str(league_id) + "/users")
+    def get_users_in_league(self, league_id):
+        r = requests.get(self._get_league_base_url + str(league_id) + "/users")
         users = {}
         for data in r.json():
             user = User(data)
@@ -139,7 +140,7 @@ class SleeperPy:
         return users
 
     # Retrieve a specific player from the map, otherwise returning unknown
-    def getPlayer(self, player_id):
+    def get_player(self, player_id):
         # Retrieve the player from the in-memory dictionary
         if player_id in self.player_map:
             return self.player_map[player_id]
