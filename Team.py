@@ -11,7 +11,7 @@ class Team:
     def get_offensive_player_count(self):
         count = 0
         for player in self.players:
-            if player.isOffensive():
+            if player.is_offensive():
                 count += 1
 
         return count
@@ -20,7 +20,7 @@ class Team:
     def get_defensive_player_count(self):
         count = 0
         for player in self.players:
-            if player.isDefensive():
+            if player.is_defensive():
                 count += 1
 
         return count
